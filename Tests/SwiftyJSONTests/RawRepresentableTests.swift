@@ -21,10 +21,22 @@
 //  THE SOFTWARE.
 
 import XCTest
+import Foundation
 import SwiftyJSON
 
-class RawRepresentableTests: XCTestCase {
+final class RawRepresentableTests: XCTestCase, XCTestCaseProvider {
 
+    static var allTests: [(String, (RawRepresentableTests) -> () throws -> Void)] {
+        return [
+            ("testNumber", testNumber),
+            ("testBool", testBool),
+            ("testString", testString),
+            ("testNil", testNil),
+            ("testArray", testArray),
+            ("testDictionary", testDictionary)
+        ]
+    }
+    
     func testNumber() {
         var json:JSON = JSON(rawValue: 948394394.347384 as NSNumber)!
         XCTAssertEqual(json.int!, 948394394)

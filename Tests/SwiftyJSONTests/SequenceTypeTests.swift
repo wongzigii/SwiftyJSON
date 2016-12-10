@@ -22,16 +22,34 @@
 //  THE SOFTWARE.
 
 import XCTest
+import Foundation
 import SwiftyJSON
 
-class SequenceTypeTests: XCTestCase {
+final class SequenceTypeTests: XCTestCase, XCTestCaseProvider {
+    
+    static var allTests: [(String, (SequenceTypeTests) -> () throws -> Void)] {
+        return [
+            ("testArrayAllNumber", testArrayAllNumber),
+            ("testArrayAllBool", testArrayAllBool),
+            ("testArrayAllString", testArrayAllString),
+            ("testArrayWithNull", testArrayWithNull),
+            ("testArrayAllDictionary", testArrayAllDictionary),
+            ("testDictionaryAllNumber", testDictionaryAllNumber),
+            ("testDictionaryAllBool", testDictionaryAllBool),
+            ("testDictionaryAllString", testDictionaryAllString),
+            ("testDictionaryWithNull", testDictionaryWithNull),
+            ("testDictionaryAllArray", testDictionaryAllArray),
+            ("testDictionaryIteratingPerformance", testDictionaryIteratingPerformance),
+            ("testJSONFile", testJSONFile)
+        ]
+    }
 
     func testJSONFile() {
         if let file = Bundle(for:BaseTests.self).path(forResource: "Tests", ofType: "json") {
             let testData = try? Data(contentsOf: URL(fileURLWithPath: file))
             let json = JSON(data:testData!)
             for (index, sub) in json {
-                switch (index as NSString).integerValue {
+                switch NSString(string: index).integerValue {
                 case 0:
                     XCTAssertTrue(sub["id_str"] == "240558470661799936")
                 case 1:
@@ -100,11 +118,11 @@ class SequenceTypeTests: XCTestCase {
         XCTAssertEqual(json.count, 4)
 
         var index = 0
-        var array = [AnyObject]()
+        var array = [Any]()
         for (i, sub) in json {
             XCTAssertEqual(sub, json[index])
             XCTAssertEqual(i, "\(index)")
-            array.append(sub.object as AnyObject)
+            array.append(sub.object)
             index += 1
         }
         XCTAssertEqual(index, 4)
@@ -117,11 +135,11 @@ class SequenceTypeTests: XCTestCase {
         XCTAssertEqual(json.count, 3)
 
         var index = 0
-        var array = [AnyObject]()
+        var array = [Any]()
         for (i, sub) in json {
             XCTAssertEqual(sub, json[index])
             XCTAssertEqual(i, "\(index)")
-            array.append(sub.object as AnyObject)
+            array.append(sub.object)
             index += 1
         }
         XCTAssertEqual(index, 3)
@@ -188,10 +206,10 @@ class SequenceTypeTests: XCTestCase {
         XCTAssertEqual(json.count, 4)
 
         var index = 0
-        var dictionary = [String:AnyObject]()
+        var dictionary = [String: Any]()
         for (key, sub) in json {
             XCTAssertEqual(sub, json[key])
-            dictionary[key] = sub.object as AnyObject?
+            dictionary[key] = sub.object
             index += 1
         }
 
@@ -207,10 +225,10 @@ class SequenceTypeTests: XCTestCase {
         XCTAssertEqual(json.count, 3)
 
         var index = 0
-        var dictionary = [String:AnyObject]()
+        var dictionary = [String: Any]()
         for (key, sub) in json {
             XCTAssertEqual(sub, json[key])
-            dictionary[key] = sub.object as AnyObject?
+            dictionary[key] = sub.object
             index += 1
         }
 

@@ -21,10 +21,30 @@
 //  THE SOFTWARE.
 
 import XCTest
+import Foundation
 import SwiftyJSON
 
-class NumberTests: XCTestCase {
+final class NumberTests: XCTestCase, XCTestCaseProvider {
 
+    static var allTests: [(String, (NumberTests) -> () throws -> Void)] {
+        return [
+            ("testNumber", testNumber),
+            ("testBool", testBool),
+            ("testDouble", testDouble),
+            ("testFloat", testFloat),
+            ("testInt", testInt),
+            ("testUInt", testUInt),
+            ("testInt8", testInt8),
+            ("testUInt8", testUInt8),
+            ("testInt16", testInt16),
+            ("testUInt16", testUInt16),
+            ("testInt32", testInt32),
+            ("testUInt32", testUInt32),
+            ("testInt64", testInt64),
+            ("testUInt64", testUInt64)
+        ]
+    }
+    
     func testNumber() {
         //getter
         var json = JSON(NSNumber(value: 9876543210.123456789))
@@ -344,7 +364,7 @@ class NumberTests: XCTestCase {
     }
 
     func testInt64() {
-        let int64Max = NSNumber(value: INT64_MAX)
+        let int64Max = NSNumber(value: Int64.max)
         var json = JSON(int64Max)
         XCTAssertTrue(json.int64! == int64Max.int64Value)
         XCTAssertTrue(json.int64Value == int64Max.int64Value)
@@ -360,7 +380,7 @@ class NumberTests: XCTestCase {
         XCTAssertEqual(json.numberValue, n32767)
         XCTAssertEqual(json.stringValue, "32767")
         
-        let int64Min = NSNumber(value: (INT64_MAX-1) * -1)
+        let int64Min = NSNumber(value: (Int64.max-1) * -1)
         json.int64Value = int64Min.int64Value
         XCTAssertTrue(json.int64! == int64Min.int64Value)
         XCTAssertTrue(json.int64Value == int64Min.int64Value)
@@ -370,7 +390,7 @@ class NumberTests: XCTestCase {
     }
     
     func testUInt64() {
-        let uInt64Max = NSNumber(value: UINT64_MAX)
+        let uInt64Max = NSNumber(value: UInt64.max)
         var json = JSON(uInt64Max)
         XCTAssertTrue(json.uInt64! == uInt64Max.uint64Value)
         XCTAssertTrue(json.uInt64Value == uInt64Max.uint64Value)

@@ -21,10 +21,28 @@
 //  THE SOFTWARE.
 
 import XCTest
+import Foundation
 import SwiftyJSON
 
-class PerformanceTests: XCTestCase {
+#if os(Linux)
+func autoreleasepool(callback:() -> ()) {
+    callback()
+}
+#endif
 
+final class PerformanceTests: XCTestCase, XCTestCaseProvider {
+	
+    static var allTests: [(String, (PerformanceTests) -> () throws -> Void)] {
+        return [
+            ("testInitPerformance", testInitPerformance),
+            ("testObjectMethodPerformance", testObjectMethodPerformance),
+            ("testArrayMethodPerformance", testArrayMethodPerformance),
+            ("testDictionaryMethodPerformance", testDictionaryMethodPerformance),
+            ("testRawStringMethodPerformance", testRawStringMethodPerformance),
+            ("testLargeDictionaryMethodPerformance", testLargeDictionaryMethodPerformance)
+        ]
+    }
+    
     var testData: Data!
     
     override func setUp() {

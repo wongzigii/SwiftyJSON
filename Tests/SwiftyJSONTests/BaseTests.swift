@@ -21,10 +21,27 @@
 //  THE SOFTWARE.
 
 import XCTest
-@testable import SwiftyJSON
+import Foundation
+import SwiftyJSON
 
-class BaseTests: XCTestCase {
+final class BaseTests: XCTestCase, XCTestCaseProvider {
 
+    static var allTests: [(String, (BaseTests) -> () throws -> Void)] {
+        return [
+            ("testInit", testInit),
+            ("testCompare", testCompare),
+            ("testJSONDoesProduceValidWithCorrectKeyPath", testJSONDoesProduceValidWithCorrectKeyPath),
+            ("testJSONNumberCompare", testJSONNumberCompare),
+            ("testNumberConvertToString", testNumberConvertToString),
+            ("testNumberPrint", testNumberPrint),
+            ("testNullJSON", testNullJSON),
+            ("testExistance", testExistance),
+            ("testErrorHandle", testErrorHandle),
+            ("testReturnObject", testReturnObject),
+            ("testNumberCompare", testNumberCompare)
+        ]
+    }
+    
     var testData: Data!
     
     override func setUp() {
