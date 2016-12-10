@@ -64,14 +64,11 @@ public struct JSON {
 
      - returns: The created JSON
      */
-    public init(data:Data, options opt: JSONSerialization.ReadingOptions = .allowFragments, error: NSErrorPointer = nil) {
+    public init(data:Data, options opt: JSONSerialization.ReadingOptions = .allowFragments) {
         do {
             let object: Any = try JSONSerialization.jsonObject(with: data, options: opt)
             self.init(object)
-        } catch let aError as NSError {
-            if error != nil {
-                error?.pointee = aError
-            }
+        } catch {
             self.init(NSNull())
         }
     }
@@ -125,8 +122,8 @@ public struct JSON {
     }
 
     /// Private object
-    fileprivate var rawArray: [Any] = []
-    fileprivate var rawDictionary: [String : Any] = [:]
+    fileprivate var rawArray: [AnyObject] = []
+    fileprivate var rawDictionary: [String : AnyObject] = [:]
     fileprivate var rawString: String = ""
     fileprivate var rawNumber: NSNumber = 0
     fileprivate var rawNull: NSNull = NSNull()
@@ -174,10 +171,10 @@ public struct JSON {
 				_type = .array
 			case nil:
 				_type = .null
-            case let array as [Any]:
+            case let array as [AnyObject]:
                 _type = .array
                 self.rawArray = array
-            case let dictionary as [String : Any]:
+            case let dictionary as [String : AnyObject]:
                 _type = .dictionary
                 self.rawDictionary = dictionary
             default:
@@ -237,7 +234,7 @@ public enum JSONIndex:Comparable
 public enum JSONRawIndex: Comparable
 {
     case array(Int)
-    case dictionary(DictionaryIndex<String, Any>)
+    case dictionary(DictionaryIndex<String, AnyObject>)
     case null
 
     static public func ==(lhs: JSONRawIndex, rhs: JSONRawIndex) -> Bool
@@ -379,7 +376,11 @@ extension JSON {
         set {
             if self.type == .array {
                 if self.rawArray.count > index && newValue.error == nil {
-                    self.rawArray[index] = newValue.object
+#if os(Linux)
+					self.rawArray[index] = newValue.object as! AnyObject
+#else
+					self.rawArray[index] = newValue.object as AnyObject
+#endif
                 }
             }
         }
@@ -402,7 +403,11 @@ extension JSON {
         }
         set {
             if self.type == .dictionary && newValue.error == nil {
-                self.rawDictionary[key] = newValue.object
+#if os(Linux)
+				self.rawDictionary[key] = newValue.object as? AnyObject
+#else
+				self.rawDictionary[key] = newValue.object as AnyObject
+#endif
             }
         }
     }
@@ -1275,9 +1280,17 @@ public func ==(lhs: JSON, rhs: JSON) -> Bool {
     case (.bool, .bool):
         return lhs.rawBool == rhs.rawBool
     case (.array, .array):
-        return lhs.rawArray as NSArray == rhs.rawArray as NSArray
+#if os(Linux)
+		return lhs.rawArray._bridgeToObjectiveC() == rhs.rawArray._bridgeToObjectiveC()
+#else
+		return lhs.rawArray as NSArray == rhs.rawArray as NSArray
+#endif
     case (.dictionary, .dictionary):
-        return lhs.rawDictionary as NSDictionary == rhs.rawDictionary as NSDictionary
+#if os(Linux)
+		return lhs.rawDictionary._bridgeToObjectiveC() == rhs.rawDictionary._bridgeToObjectiveC()
+#else
+		return lhs.rawDictionary as NSDictionary == rhs.rawDictionary as NSDictionary
+#endif
     case (.null, .null):
         return true
     default:
@@ -1295,9 +1308,17 @@ public func <=(lhs: JSON, rhs: JSON) -> Bool {
     case (.bool, .bool):
         return lhs.rawBool == rhs.rawBool
     case (.array, .array):
-        return lhs.rawArray as NSArray == rhs.rawArray as NSArray
+#if os(Linux)
+		return lhs.rawArray._bridgeToObjectiveC() == rhs.rawArray._bridgeToObjectiveC()
+#else
+		return lhs.rawArray as NSArray == rhs.rawArray as NSArray
+#endif
     case (.dictionary, .dictionary):
-        return lhs.rawDictionary as NSDictionary == rhs.rawDictionary as NSDictionary
+#if os(Linux)
+		return lhs.rawDictionary._bridgeToObjectiveC() == rhs.rawDictionary._bridgeToObjectiveC()
+#else
+		return lhs.rawDictionary as NSDictionary == rhs.rawDictionary as NSDictionary
+#endif
     case (.null, .null):
         return true
     default:
@@ -1315,9 +1336,17 @@ public func >=(lhs: JSON, rhs: JSON) -> Bool {
     case (.bool, .bool):
         return lhs.rawBool == rhs.rawBool
     case (.array, .array):
-        return lhs.rawArray as NSArray == rhs.rawArray as NSArray
+#if os(Linux)
+		return lhs.rawArray._bridgeToObjectiveC() == rhs.rawArray._bridgeToObjectiveC()
+#else
+		return lhs.rawArray as NSArray == rhs.rawArray as NSArray
+#endif
     case (.dictionary, .dictionary):
-        return lhs.rawDictionary as NSDictionary == rhs.rawDictionary as NSDictionary
+#if os(Linux)
+		return lhs.rawDictionary._bridgeToObjectiveC() == rhs.rawDictionary._bridgeToObjectiveC()
+#else
+		return lhs.rawDictionary as NSDictionary == rhs.rawDictionary as NSDictionary
+#endif
     case (.null, .null):
         return true
     default:
