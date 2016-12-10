@@ -48,10 +48,15 @@ final class BaseTests: XCTestCase, XCTestCaseProvider {
         
         super.setUp()
         
-        if let file = Bundle(for:BaseTests.self).path(forResource: "Tests", ofType: "json") {
-            self.testData = try? Data(contentsOf: URL(fileURLWithPath: file))
-        } else {
-            XCTFail("Can't find the test JSON file")
+        do {
+#if os(Linux)
+        	self.testData = try Data(contentsOf: URL(fileURLWithPath: "Tests/SwiftyJSONTests/Tests.json"))
+#else
+        	let file = Bundle(for:PerformanceTests.self).path(forResource: "Tests", ofType: "json")
+        	self.testData = try Data(contentsOf: URL(fileURLWithPath: file!))
+#endif
+        } catch {
+        	XCTFail("Failed to read in the test data")
         }
     }
     
@@ -63,7 +68,7 @@ final class BaseTests: XCTestCase, XCTestCaseProvider {
         let json0 = JSON(data:self.testData)
         XCTAssertEqual(json0.array!.count, 3)
         XCTAssertEqual(JSON("123").description, "123")
-        XCTAssertEqual(JSON(["1":"2"])["1"].string!, "2")
+        XCTAssertEqual(JSON(["1":"2"])["1"].string, "2")
         let dictionary = NSMutableDictionary()
         dictionary.setObject(NSNumber(value: 1.0), forKey: "number" as NSString)
         dictionary.setObject(NSNull(), forKey: "null" as NSString)
