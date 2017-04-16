@@ -254,7 +254,7 @@ public struct JSON {
 		} else if let dictionary = newValue as? NSDictionary {
 			type = .dictionary
 			value = dictionary._bridgeToSwift()
-		} else if let dictionary = newValue as? [String, Any] {
+    	} else if let dictionary = newValue as? [String: Any] {
 			type = .dictionary
 			value = dictionary
 		} else {
