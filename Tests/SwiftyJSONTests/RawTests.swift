@@ -35,7 +35,8 @@ final class RawTests: XCTestCase, XCTestCaseProvider {
 			("testString", testString),
 			("testNumber", testNumber),
 			("testBool", testBool),
-			("testNull", testNull)
+			("testNull", testNull),
+			("testNestedJSON", testNestedJSON)
 		]
 	}
 

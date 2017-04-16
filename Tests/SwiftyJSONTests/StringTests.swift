@@ -29,11 +29,11 @@ final class StringTests: XCTestCase, XCTestCaseProvider {
 	static var allTests: [(String, (StringTests) -> () throws -> Void)] {
 		return [
 			("testString", testString),
-			("testURL", testUrl),
+			("testUrl", testUrl),
 			("testBool", testBool),
 			("testBoolWithY", testBoolWithY),
 			("testBoolWithT", testBoolWithT),
-			("testURLPercentEscapes", testUrlPercentEscapes)
+			("testUrlPercentEscapes", testUrlPercentEscapes)
 		]
 	}
 

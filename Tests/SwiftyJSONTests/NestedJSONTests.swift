@@ -15,7 +15,10 @@ final class NestedJSONTests: XCTestCase, XCTestCaseProvider {
 	static var allTests: [(String, (NestedJSONTests) -> () throws -> Void)] {
 		return [
 			("testTopLevelNestedJSON", testTopLevelNestedJSON),
-			("testDeeplyNestedJSON", testDeeplyNestedJSON)
+			("testDeeplyNestedJSON", testDeeplyNestedJSON),
+			("testArrayJSON", testArrayJSON),
+			("testDictionaryJSON", testDictionaryJSON),
+			("testNestedJSON", testNestedJSON)
 		]
 	}
 
