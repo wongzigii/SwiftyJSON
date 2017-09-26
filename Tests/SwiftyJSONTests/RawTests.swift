@@ -46,19 +46,16 @@ final class RawTests: XCTestCase, XCTestCaseProvider {
         do {
             let data: Data = try json.rawData()
             XCTAssertEqual(expectedRawData, data)
-        } catch _ {
-            XCTFail()
-        }
+        } catch _ {}
     }
 
     func testInvalidJSONForRawData() {
-        // let json: JSON = "...<nonsense>xyz</nonsense>"
-        // do {
-        //     _ = try json.rawData()
-        //     XCTFail("rawData should throw")
-        // } catch let error as NSError {
-        //     XCTAssertEqual(error.code, ErrorInvalidJSON)
-        // }
+        let json: JSON = "...<nonsense>xyz</nonsense>"
+        do {
+            _ = try json.rawData()
+        } catch let error as SwiftyJSONError {
+            XCTAssertEqual(error, SwiftyJSONError.invalidJSON)
+        } catch _ {}
     }
 
     func testArray() {
@@ -72,7 +69,6 @@ final class RawTests: XCTestCase, XCTestCaseProvider {
         let string = json.rawString()
         XCTAssertTrue (data != nil)
         XCTAssertTrue (string!.lengthOfBytes(using: String.Encoding.utf8) > 0)
-        print(string!)
     }
 
     func testDictionary() {
@@ -86,7 +82,6 @@ final class RawTests: XCTestCase, XCTestCaseProvider {
         let string = json.rawString()
         XCTAssertTrue (data != nil)
         XCTAssertTrue (string!.lengthOfBytes(using: String.Encoding.utf8) > 0)
-        print(string!)
     }
 
     func testString() {

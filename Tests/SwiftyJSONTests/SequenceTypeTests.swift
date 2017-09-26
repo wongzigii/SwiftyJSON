@@ -1,4 +1,3 @@
-//
 //  SequenceTypeTests.swift
 //
 //  Copyright (c) 2014 - 2017 Pinglin Tang
@@ -62,19 +61,27 @@ final class SequenceTypeTests: XCTestCase, XCTestCaseProvider {
 	}
 
     func testJSONFile() {
-		let json = JSON(data:testData!)
-		for (index, sub) in json {
-			switch Int(index as String)! {
-			case 0:
-				XCTAssertTrue(sub["id_str"] == "240558470661799936")
-			case 1:
-				XCTAssertTrue(sub["id_str"] == "240556426106372096")
-			case 2:
-				XCTAssertTrue(sub["id_str"] == "240539141056638977")
-			default:
-				continue
-			}
-		}
+        if let file = Bundle(for:BaseTests.self).path(forResource: "Tests", ofType: "json") {
+            let testData = try? Data(contentsOf: URL(fileURLWithPath: file))
+            guard let json = try? JSON(data: testData!) else {
+                XCTFail("Unable to parse the data")
+                return
+            }
+            for (index, sub) in json {
+                switch (index as NSString).integerValue {
+                case 0:
+                    XCTAssertTrue(sub["id_str"] == "240558470661799936")
+                case 1:
+                    XCTAssertTrue(sub["id_str"] == "240556426106372096")
+                case 2:
+                    XCTAssertTrue(sub["id_str"] == "240539141056638977")
+                default:
+                    continue
+                }
+            }
+        } else {
+            XCTFail("Can't find the test JSON file")
+        }
     }
 
     func testArrayAllNumber() {

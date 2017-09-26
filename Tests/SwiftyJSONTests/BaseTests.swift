@@ -21,8 +21,7 @@
 //  THE SOFTWARE.
 
 import XCTest
-import Foundation
-@testable import SwiftyJSON
+import SwiftyJSON
 
 final class BaseTests: XCTestCase, XCTestCaseProvider {
 
@@ -64,7 +63,10 @@ final class BaseTests: XCTestCase, XCTestCaseProvider {
     }
 
     func testInit() {
-        let json0 = JSON(data:self.testData)
+        guard let json0 = try? JSON(data: self.testData) else {
+            XCTFail("Unable to parse testData")
+            return
+        }
         XCTAssertEqual(json0.array!.count, 3)
         XCTAssertEqual(JSON("123").description, "123")
         XCTAssertEqual(JSON(["1": "2"])["1"].string!, "2")
@@ -97,7 +99,11 @@ final class BaseTests: XCTestCase, XCTestCaseProvider {
     }
 
     func testJSONDoesProduceValidWithCorrectKeyPath() {
-        let json = JSON(data:self.testData)
+
+        guard let json = try? JSON(data: self.testData) else {
+            XCTFail("Unable to parse testData")
+            return
+        }
 
         let tweets = json
         let tweets_array = json.array
@@ -250,39 +256,48 @@ final class BaseTests: XCTestCase, XCTestCaseProvider {
     }
 
     func testErrorHandle() {
+<<<<<<< HEAD
         let json = JSON(data:self.testData)
+=======
+        guard let json = try? JSON(data: self.testData) else {
+            XCTFail("Unable to parse testData")
+            return
+        }
+>>>>>>> e1b9090415109b61b6f16b97c75399ed1bec5e62
         if json["wrong-type"].string != nil {
             XCTFail("Should not run into here")
         } else {
-            XCTAssertEqual(json["wrong-type"].error!.code, SwiftyJSON.ErrorWrongType)
+            XCTAssertEqual(json["wrong-type"].error, SwiftyJSONError.wrongType)
         }
 
         if json[0]["not-exist"].string != nil {
             XCTFail("Should not run into here")
         } else {
-            XCTAssertEqual(json[0]["not-exist"].error!.code, SwiftyJSON.ErrorNotExist)
+            XCTAssertEqual(json[0]["not-exist"].error, SwiftyJSONError.notExist)
         }
 
         let wrongJSON = JSON(NSObject())
         if let error = wrongJSON.error {
-            XCTAssertEqual(error.code, SwiftyJSON.ErrorUnsupportedType)
+            XCTAssertEqual(error, SwiftyJSONError.unsupportedType)
         }
     }
 
     func testReturnObject() {
-        let json = JSON(data:self.testData)
+        guard let json = try? JSON(data: self.testData) else {
+            XCTFail("Unable to parse testData")
+            return
+        }
         XCTAssertNotNil(json.object)
     }
 
-    func testNumberCompare() {
-        XCTAssertEqual(NSNumber(value: 888332), NSNumber(value:888332))
-        XCTAssertNotEqual(NSNumber(value: 888332.1), NSNumber(value:888332))
-        XCTAssertLessThan(NSNumber(value: 888332).doubleValue, NSNumber(value:888332.1).doubleValue)
-        XCTAssertGreaterThan(NSNumber(value: 888332.1).doubleValue, NSNumber(value:888332).doubleValue)
-        XCTAssertFalse(NSNumber(value: 1) == NSNumber(value:true))
-        XCTAssertFalse(NSNumber(value: 0) == NSNumber(value:false))
-        XCTAssertEqual(NSNumber(value: false), NSNumber(value:false))
-        XCTAssertEqual(NSNumber(value: true), NSNumber(value:true))
+    func testErrorThrowing() {
+        let invalidJson = "{\"foo\": 300]"  // deliberately incorrect JSON
+        let invalidData = invalidJson.data(using: .utf8)!
+        do {
+            _ = try JSON(data: invalidData)
+            XCTFail("Should have thrown error; we should not have gotten here")
+        } catch {
+            // everything is OK
+        }
     }
-
 }
