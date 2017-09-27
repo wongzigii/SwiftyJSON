@@ -839,11 +839,7 @@ extension JSON: Swift.RawRepresentable {
         case .string:
             return self.rawString
         case .number:
-#if os(Linux)
-            return self.stringFromNumber(self.rawNumber)
-#else
-            return self.rawNumber.stringValue
-#endif
+			return self.rawNumber.stringValue
         case .bool:
             return self.rawBool.description
         case .null:
@@ -1025,11 +1021,7 @@ extension JSON {
             case .string:
                 return self.object as? String ?? ""
             case .number:
-#if os(Linux)
-                return JSON.stringFromNumber(self.object as! NSNumber)
-#else
-                return self.rawNumber.stringValue
-#endif
+				return self.rawNumber.stringValue
             case .bool:
                 return (self.object as? Bool).map { String($0) } ?? ""
             default:
