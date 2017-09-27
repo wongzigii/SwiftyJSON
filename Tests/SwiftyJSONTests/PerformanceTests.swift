@@ -49,12 +49,16 @@ final class PerformanceTests: XCTestCase, XCTestCaseProvider {
 
     override func setUp() {
         super.setUp()
-        #if os(Linux)
-            self.testData = try Data(contentsOf: URL(fileURLWithPath: "Tests/SwiftyJSONTests/Tests.json"))
-        #else
-            let file = Bundle(for:PerformanceTests.self).path(forResource: "Tests", ofType: "json")
-            self.testData = try Data(contentsOf: URL(fileURLWithPath: file!))
-        #endif
+        do {
+            #if os(Linux)
+                self.testData = try Data(contentsOf: URL(fileURLWithPath: "Tests/SwiftyJSONTests/Tests.json"))
+            #else
+                let file = Bundle(for:PerformanceTests.self).path(forResource: "Tests", ofType: "json")
+                self.testData = try Data(contentsOf: URL(fileURLWithPath: file!))
+            #endif
+        } catch {
+            XCTFail("Failed to read in the test data")
+        }
     }
 
     override func tearDown() {
