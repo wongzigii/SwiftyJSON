@@ -48,7 +48,11 @@ final class RawRepresentableTests: XCTestCase, XCTestCaseProvider {
 
         let object: Any = json.rawValue
 #if !os(Linux)
-        XCTAssertEqual(object as? Int, 948394394)
+    
+    	if let object = object as? Int {
+            XCTAssertEqual(object, 948394394)
+    	}
+
         XCTAssertEqual(object as? Double, 948394394.347384)
         XCTAssertTrue(object as! Float == 948394394.347384)
 #endif

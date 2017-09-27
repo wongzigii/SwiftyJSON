@@ -253,32 +253,6 @@ public struct JSON {
         }
         set {
             error = nil
-#if os(Linux)
-            let (type, value) = self.setObjectHelper(newValue)
-            _type = type
-            switch type {
-            case .array:
-                self.rawArray = value as! [Any]
-            case .bool:
-                self.rawBool = value as! Bool
-                if let number = newValue as? NSNumber {
-                    self.rawNumber = number
-                } else {
-                    self.rawNumber = self.rawBool ? NSNumber(value: 1) : NSNumber(value: 0)
-                }
-            case .dictionary:
-                self.rawDictionary = value as! [String:Any]
-            case .null:
-                break
-            case .number:
-                self.rawNumber = value as! NSNumber
-            case .string:
-                self.rawString = value as! String
-            case .unknown:
-                _error = NSError(domain: ErrorDomain, code: ErrorUnsupportedType, userInfo: [NSLocalizedDescriptionKey: "It is a unsupported type"])
-                print("==> error=\(_error). type=\(type(of: newValue))")
-            }
-#else
             switch unwrap(newValue) {
             case let number as NSNumber:
                 if number.isBool {
@@ -305,7 +279,6 @@ public struct JSON {
                 type = .unknown
                 error = SwiftyJSONError.unsupportedType
             }
-#endif
         }
     }
 

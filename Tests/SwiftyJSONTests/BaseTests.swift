@@ -37,7 +37,8 @@ final class BaseTests: XCTestCase, XCTestCaseProvider {
 			("testExistance", testExistance),
 			("testErrorHandle", testErrorHandle),
 			("testReturnObject", testReturnObject),
-			("testNumberCompare", testNumberCompare)
+			("testJSONNumberCompare", testJSONNumberCompare),
+            ("testErrorThrowing", testErrorThrowing)
 		]
 	}
 
@@ -256,14 +257,10 @@ final class BaseTests: XCTestCase, XCTestCaseProvider {
     }
 
     func testErrorHandle() {
-<<<<<<< HEAD
-        let json = JSON(data:self.testData)
-=======
         guard let json = try? JSON(data: self.testData) else {
             XCTFail("Unable to parse testData")
             return
         }
->>>>>>> e1b9090415109b61b6f16b97c75399ed1bec5e62
         if json["wrong-type"].string != nil {
             XCTFail("Should not run into here")
         } else {

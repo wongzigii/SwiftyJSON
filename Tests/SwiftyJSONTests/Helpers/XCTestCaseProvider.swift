@@ -22,7 +22,7 @@ public protocol XCTestCaseNameProvider {
 
 public protocol XCTestCaseProvider: XCTestCaseProviderStatic, XCTestCaseNameProvider {}
 
-extension XCTestCaseProvider where Self: XCTestCaseProviderStatic {
+extension XCTestCaseProvider {
     var allTestNames: [String] {
         return type(of: self).allTests.map({ name, _ in
             return name
@@ -31,22 +31,22 @@ extension XCTestCaseProvider where Self: XCTestCaseProviderStatic {
 }
 
 #if os(OSX) || os(iOS) || os(watchOS) || os(tvOS)
-
-extension XCTestCase {
-    override open func tearDown() {
-        if let provider = self as? XCTestCaseNameProvider {
-            provider.assertContainsTest(invocation!.selector.description)
+    
+    extension XCTestCase {
+        override open func tearDown() {
+            if let provider = self as? XCTestCaseNameProvider {
+                provider.assertContainsTest(invocation!.selector.description)
+            }
+            
+            super.tearDown()
         }
-
-        super.tearDown()
     }
-}
-
-extension XCTestCaseNameProvider {
-    fileprivate func assertContainsTest(_ name: String) {
-        let contains = self.allTestNames.contains(name)
-        XCTAssert(contains, "Test '\(name)' is missing from the allTests array")
+    
+    extension XCTestCaseNameProvider {
+        fileprivate func assertContainsTest(_ name: String) {
+            let contains = self.allTestNames.contains(name)
+            XCTAssert(contains, "Test '\(name)' is missing from the allTests array")
+        }
     }
-}
-
+    
 #endif
