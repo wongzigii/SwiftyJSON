@@ -68,7 +68,7 @@ final class SequenceTypeTests: XCTestCase, XCTestCaseProvider {
                 return
             }
             for (index, sub) in json {
-                switch (index as NSString).integerValue {
+                switch Int(index)! {
                 case 0:
                     XCTAssertTrue(sub["id_str"] == "240558470661799936")
                 case 1:
