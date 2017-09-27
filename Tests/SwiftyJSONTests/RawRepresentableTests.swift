@@ -21,9 +21,21 @@
 //  THE SOFTWARE.
 
 import XCTest
+import Foundation
 import SwiftyJSON
 
-class RawRepresentableTests: XCTestCase {
+final class RawRepresentableTests: XCTestCase, XCTestCaseProvider {
+
+	static var allTests: [(String, (RawRepresentableTests) -> () throws -> Void)] {
+		return [
+			("testNumber", testNumber),
+			("testBool", testBool),
+			("testString", testString),
+			("testNil", testNil),
+			("testArray", testArray),
+			("testDictionary", testDictionary)
+		]
+	}
 
     func testNumber() {
         var json: JSON = JSON(rawValue: 948394394.347384 as NSNumber)!
@@ -31,14 +43,20 @@ class RawRepresentableTests: XCTestCase {
         XCTAssertEqual(json.intValue, 948394394)
         XCTAssertEqual(json.double!, 948394394.347384)
         XCTAssertEqual(json.doubleValue, 948394394.347384)
-        XCTAssertTrue(json.float! == 948394394.347384)
-        XCTAssertTrue(json.floatValue == 948394394.347384)
+        XCTAssertEqual(json.float!, 948394394.347384)
+        XCTAssertEqual(json.floatValue, 948394394.347384)
 
         let object: Any = json.rawValue
-        XCTAssertEqual(object as? Int, 948394394)
+#if !os(Linux)
+    
+    	if let object = object as? Int {
+            XCTAssertEqual(object, 948394394)
+    	}
+
         XCTAssertEqual(object as? Double, 948394394.347384)
         XCTAssertTrue(object as! Float == 948394394.347384)
-        XCTAssertEqual(object as? NSNumber, 948394394.347384)
+#endif
+		XCTAssertEqual(object as? NSNumber, 948394394.347384)
     }
 
     func testBool() {
@@ -82,7 +100,9 @@ class RawRepresentableTests: XCTestCase {
         }
     }
 
+// Conversions from array/dictionary to NSArray/NSDictionary are not allowed
     func testArray() {
+#if !os(Linux)
         let array = [1, 2, "3", 4102, "5632", "abocde", "!@# $%^&*()"] as NSArray
         if let json: JSON = JSON(rawValue: array) {
             XCTAssertEqual(json, JSON(array))
@@ -90,9 +110,11 @@ class RawRepresentableTests: XCTestCase {
 
         let object: Any = JSON(rawValue: array)!.rawValue
         XCTAssertTrue(array == object as! NSArray)
+#endif
     }
 
     func testDictionary() {
+#if !os(Linux)
         let dictionary = ["1": 2, "2": 2, "three": 3, "list": ["aa", "bb", "dd"]] as NSDictionary
         if let json: JSON = JSON(rawValue: dictionary) {
             XCTAssertEqual(json, JSON(dictionary))
@@ -100,5 +122,6 @@ class RawRepresentableTests: XCTestCase {
 
         let object: Any = JSON(rawValue: dictionary)!.rawValue
         XCTAssertTrue(dictionary == object as! NSDictionary)
+#endif
     }
 }

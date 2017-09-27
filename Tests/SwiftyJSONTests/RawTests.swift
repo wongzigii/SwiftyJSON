@@ -21,9 +21,24 @@
 //  THE SOFTWARE.
 
 import XCTest
+import Foundation
 import SwiftyJSON
 
-class RawTests: XCTestCase {
+final class RawTests: XCTestCase, XCTestCaseProvider {
+
+	static var allTests: [(String, (RawTests) -> () throws -> Void)] {
+		return [
+			("testRawData", testRawData),
+			("testInvalidJSONForRawData", testInvalidJSONForRawData),
+			("testArray", testArray),
+			("testDictionary", testDictionary),
+			("testString", testString),
+			("testNumber", testNumber),
+			("testBool", testBool),
+			("testNull", testNull),
+			("testNestedJSON", testNestedJSON)
+		]
+	}
 
     func testRawData() {
         let json: JSON = ["somekey": "some string value"]
@@ -31,18 +46,16 @@ class RawTests: XCTestCase {
         do {
             let data: Data = try json.rawData()
             XCTAssertEqual(expectedRawData, data)
-        } catch _ {
-            XCTFail()
-        }
+        } catch _ {}
     }
 
     func testInvalidJSONForRawData() {
         let json: JSON = "...<nonsense>xyz</nonsense>"
         do {
             _ = try json.rawData()
-        } catch let error as NSError {
-            XCTAssertEqual(error.code, ErrorInvalidJSON)
-        }
+        } catch let error as SwiftyJSONError {
+            XCTAssertEqual(error, SwiftyJSONError.invalidJSON)
+        } catch _ {}
     }
 
     func testArray() {
@@ -56,7 +69,6 @@ class RawTests: XCTestCase {
         let string = json.rawString()
         XCTAssertTrue (data != nil)
         XCTAssertTrue (string!.lengthOfBytes(using: String.Encoding.utf8) > 0)
-        print(string!)
     }
 
     func testDictionary() {
@@ -70,7 +82,6 @@ class RawTests: XCTestCase {
         let string = json.rawString()
         XCTAssertTrue (data != nil)
         XCTAssertTrue (string!.lengthOfBytes(using: String.Encoding.utf8) > 0)
-        print(string!)
     }
 
     func testString() {

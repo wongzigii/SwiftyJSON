@@ -21,9 +21,21 @@
 //  THE SOFTWARE.
 
 import XCTest
+import Foundation
 import SwiftyJSON
 
-class StringTests: XCTestCase {
+final class StringTests: XCTestCase, XCTestCaseProvider {
+
+	static var allTests: [(String, (StringTests) -> () throws -> Void)] {
+		return [
+			("testString", testString),
+			("testUrl", testUrl),
+			("testBool", testBool),
+			("testBoolWithY", testBoolWithY),
+			("testBoolWithT", testBoolWithT),
+			("testUrlPercentEscapes", testUrlPercentEscapes)
+		]
+	}
 
     func testString() {
         //getter

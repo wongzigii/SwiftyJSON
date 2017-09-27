@@ -21,9 +21,36 @@
 //  THE SOFTWARE.
 
 import XCTest
+import Foundation
 import SwiftyJSON
 
-class ComparableTests: XCTestCase {
+final class ComparableTests: XCTestCase, XCTestCaseProvider {
+
+	static var allTests: [(String, (ComparableTests) -> () throws -> Void)] {
+		return [
+			("testNumberEqual", testNumberEqual),
+			("testNumberNotEqual", testNumberNotEqual),
+			("testNumberGreaterThanOrEqual", testNumberGreaterThanOrEqual),
+			("testNumberLessThanOrEqual", testNumberLessThanOrEqual),
+			("testNumberGreaterThan", testNumberGreaterThan),
+			("testNumberLessThan", testNumberLessThan),
+			("testBoolEqual", testBoolEqual),
+			("testBoolNotEqual", testBoolNotEqual),
+			("testBoolGreaterThanOrEqual", testBoolGreaterThanOrEqual),
+			("testBoolLessThanOrEqual", testBoolLessThanOrEqual),
+			("testBoolGreaterThan", testBoolGreaterThan),
+			("testBoolLessThan", testBoolLessThan),
+			("testStringEqual", testStringEqual),
+			("testStringNotEqual", testStringNotEqual),
+			("testStringGreaterThanOrEqual", testStringGreaterThanOrEqual),
+			("testStringLessThanOrEqual", testStringLessThanOrEqual),
+			("testStringGreaterThan", testStringGreaterThan),
+			("testStringLessThan", testStringLessThan),
+			("testNil", testNil),
+			("testArray", testArray),
+			("testDictionary", testDictionary)
+		]
+	}
 
     func testNumberEqual() {
         let jsonL1: JSON = 1234567890.876623

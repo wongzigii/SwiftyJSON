@@ -21,21 +21,42 @@
 //  THE SOFTWARE.
 
 import XCTest
-@testable import SwiftyJSON
+import SwiftyJSON
 
-class BaseTests: XCTestCase {
+final class BaseTests: XCTestCase, XCTestCaseProvider {
+
+	static var allTests: [(String, (BaseTests) -> () throws -> Void)] {
+		return [
+			("testInit", testInit),
+			("testCompare", testCompare),
+			("testJSONDoesProduceValidWithCorrectKeyPath", testJSONDoesProduceValidWithCorrectKeyPath),
+			("testJSONNumberCompare", testJSONNumberCompare),
+			("testNumberConvertToString", testNumberConvertToString),
+			("testNumberPrint", testNumberPrint),
+			("testNullJSON", testNullJSON),
+			("testExistance", testExistance),
+			("testErrorHandle", testErrorHandle),
+			("testReturnObject", testReturnObject),
+			("testJSONNumberCompare", testJSONNumberCompare),
+            ("testErrorThrowing", testErrorThrowing)
+		]
+	}
 
     var testData: Data!
 
     override func setUp() {
 
         super.setUp()
-
-        if let file = Bundle(for:BaseTests.self).path(forResource: "Tests", ofType: "json") {
-            self.testData = try? Data(contentsOf: URL(fileURLWithPath: file))
-        } else {
-            XCTFail("Can't find the test JSON file")
-        }
+		do {
+			#if os(Linux)
+				self.testData = try Data(contentsOf: URL(fileURLWithPath: "Tests/SwiftyJSONTests/Tests.json"))
+			#else
+				let file = Bundle(for:BaseTests.self).path(forResource: "Tests", ofType: "json")
+				self.testData = try Data(contentsOf: URL(fileURLWithPath: file!))
+			#endif
+		} catch {
+			XCTFail("Failed to read in the test data")
+		}
     }
 
     override func tearDown() {
@@ -43,7 +64,10 @@ class BaseTests: XCTestCase {
     }
 
     func testInit() {
-        let json0 = JSON(data:self.testData)
+        guard let json0 = try? JSON(data: self.testData) else {
+            XCTFail("Unable to parse testData")
+            return
+        }
         XCTAssertEqual(json0.array!.count, 3)
         XCTAssertEqual(JSON("123").description, "123")
         XCTAssertEqual(JSON(["1": "2"])["1"].string!, "2")
@@ -76,7 +100,11 @@ class BaseTests: XCTestCase {
     }
 
     func testJSONDoesProduceValidWithCorrectKeyPath() {
-        let json = JSON(data:self.testData)
+
+        guard let json = try? JSON(data: self.testData) else {
+            XCTFail("Unable to parse testData")
+            return
+        }
 
         let tweets = json
         let tweets_array = json.array
@@ -94,7 +122,7 @@ class BaseTests: XCTestCase {
         let tweets_1_coordinates_coordinates = tweets_1_coordinates["coordinates"]
         let tweets_1_coordinates_coordinates_point_0_double = tweets_1_coordinates_coordinates[0].double
         let tweets_1_coordinates_coordinates_point_1_float = tweets_1_coordinates_coordinates[1].float
-        let new_tweets_1_coordinates_coordinates = JSON([-122.25831, 37.871609] as NSArray)
+        let new_tweets_1_coordinates_coordinates = JSON([-122.25831, 37.871609])
         XCTAssertEqual(tweets_1_coordinates_coordinates, new_tweets_1_coordinates_coordinates)
         XCTAssertEqual(tweets_1_coordinates_coordinates_point_0_double!, -122.25831)
         XCTAssertTrue(tweets_1_coordinates_coordinates_point_1_float! == 37.871609)
@@ -172,6 +200,7 @@ class BaseTests: XCTestCase {
         #elseif (arch(i386) || arch(arm))
         XCTAssertEqual(JSON(2147483647).description, "2147483647")
         #endif
+
         XCTAssertEqual(JSON(-1).description, "-1")
         XCTAssertEqual(JSON(-934834834).description, "-934834834")
         XCTAssertEqual(JSON(-2147483648).description, "-2147483648")
@@ -180,8 +209,11 @@ class BaseTests: XCTestCase {
         XCTAssertEqual(JSON(-9.123456789).description, "-9.123456789")
         XCTAssertEqual(JSON(-0.00000000000000001).description, "-1e-17")
         XCTAssertEqual(JSON(-999999999999999999999999.000000000000000000000001).description, "-1e+24")
+        #if !os(Linux)
+        //https://bugs.swift.org/browse/SR-1464?jql=text%20~%20%22NSNumber%22
+        //Removed this #if once bug is fix
         XCTAssertEqual(JSON(-9999999991999999999999999.88888883433343439438493483483943948341).stringValue, "-9.999999991999999e+24")
-
+        #endif
         XCTAssertEqual(JSON(Int(Int.max)).description, "\(Int.max)")
         XCTAssertEqual(JSON(NSNumber(value: Int.min)).description, "\(Int.min)")
         XCTAssertEqual(JSON(NSNumber(value: UInt.max)).description, "\(UInt.max)")
@@ -225,39 +257,44 @@ class BaseTests: XCTestCase {
     }
 
     func testErrorHandle() {
-        let json = JSON(data:self.testData)
+        guard let json = try? JSON(data: self.testData) else {
+            XCTFail("Unable to parse testData")
+            return
+        }
         if json["wrong-type"].string != nil {
             XCTFail("Should not run into here")
         } else {
-            XCTAssertEqual(json["wrong-type"].error!.code, SwiftyJSON.ErrorWrongType)
+            XCTAssertEqual(json["wrong-type"].error, SwiftyJSONError.wrongType)
         }
 
         if json[0]["not-exist"].string != nil {
             XCTFail("Should not run into here")
         } else {
-            XCTAssertEqual(json[0]["not-exist"].error!.code, SwiftyJSON.ErrorNotExist)
+            XCTAssertEqual(json[0]["not-exist"].error, SwiftyJSONError.notExist)
         }
 
         let wrongJSON = JSON(NSObject())
         if let error = wrongJSON.error {
-            XCTAssertEqual(error.code, SwiftyJSON.ErrorUnsupportedType)
+            XCTAssertEqual(error, SwiftyJSONError.unsupportedType)
         }
     }
 
     func testReturnObject() {
-        let json = JSON(data:self.testData)
+        guard let json = try? JSON(data: self.testData) else {
+            XCTFail("Unable to parse testData")
+            return
+        }
         XCTAssertNotNil(json.object)
     }
 
-    func testNumberCompare() {
-        XCTAssertEqual(NSNumber(value: 888332), NSNumber(value:888332))
-        XCTAssertNotEqual(NSNumber(value: 888332.1), NSNumber(value:888332))
-        XCTAssertLessThan(NSNumber(value: 888332).doubleValue, NSNumber(value:888332.1).doubleValue)
-        XCTAssertGreaterThan(NSNumber(value: 888332.1).doubleValue, NSNumber(value:888332).doubleValue)
-        XCTAssertFalse(NSNumber(value: 1) == NSNumber(value:true))
-        XCTAssertFalse(NSNumber(value: 0) == NSNumber(value:false))
-        XCTAssertEqual(NSNumber(value: false), NSNumber(value:false))
-        XCTAssertEqual(NSNumber(value: true), NSNumber(value:true))
+    func testErrorThrowing() {
+        let invalidJson = "{\"foo\": 300]"  // deliberately incorrect JSON
+        let invalidData = invalidJson.data(using: .utf8)!
+        do {
+            _ = try JSON(data: invalidData)
+            XCTFail("Should have thrown error; we should not have gotten here")
+        } catch {
+            // everything is OK
+        }
     }
-
 }

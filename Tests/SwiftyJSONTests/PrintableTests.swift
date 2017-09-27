@@ -21,13 +21,35 @@
 //  THE SOFTWARE.
 
 import XCTest
+import Foundation
 import SwiftyJSON
 
-class PrintableTests: XCTestCase {
+final class PrintableTests: XCTestCase, XCTestCaseProvider {
+
+	static var allTests: [(String, (PrintableTests) -> () throws -> Void)] {
+		return [
+			("testNumber", testNumber),
+			("testBool", testBool),
+			("testString", testString),
+			("testNil", testNil),
+			("testArray", testArray),
+			("testDictionary", testDictionary),
+			("testArrayWithStrings", testArrayWithStrings),
+			("testArrayWithOptionals", testArrayWithOptionals),
+			("testDictionaryWithStrings", testDictionaryWithStrings),
+			("testDictionaryWithOptionals", testDictionaryWithOptionals)
+		]
+	}
+
     func testNumber() {
         let json: JSON = 1234567890.876623
-        XCTAssertEqual(json.description, "1234567890.876623")
+#if os(Linux)
+		XCTAssertEqual(json.description, "1234567890.87662")
+        XCTAssertEqual(json.debugDescription, "1234567890.87662")
+#else
+		XCTAssertEqual(json.description, "1234567890.876623")
         XCTAssertEqual(json.debugDescription, "1234567890.876623")
+#endif
     }
 
     func testBool() {
